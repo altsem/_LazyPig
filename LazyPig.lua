@@ -168,7 +168,7 @@ local LazyPigMenuStrings = {
 		[55]= "Block BG Quest Sharing",
 		
 		[60]= "Always",
-		[61]= "Warrior Shield/Druid Bear",
+		[61]= "Warrior Shield/Druid Bear/Paladin RF",
 		[62] = "Remove Wis/Int/Spirit",
 		[63] = "Remove Aspect of the Wolf",
 		
@@ -2265,6 +2265,29 @@ function LazyPig_PlayerClass(class, unit)
 	return false
 end
 
+function LazyPig_IsRighteousFuryActive()
+	if not LazyPig_PlayerClass("Paladin", "player") then
+		return false
+	end
+
+	local buff = "Spell_Holy_SealOfFury"
+	local counter = 0
+	while GetPlayerBuff(counter) >= 0 do
+		local index, untilCancelled = GetPlayerBuff(counter)
+		if untilCancelled == 1 then
+			local texture = GetPlayerBuffTexture(index)
+			if texture then  -- Check if texture is not nil
+				if string.find(texture, buff) then
+					return true
+				end
+			end
+		end
+		counter = counter + 1
+	end
+
+	return false
+end
+
 function LazyPig_IsBearForm()
 	local i;
 	local max = GetNumShapeshiftForms();
@@ -2357,7 +2380,7 @@ end
 
 
 function LazyPig_CheckSalvation()
-	if(LPCONFIG.SALVA == 1 or LPCONFIG.SALVA == 2 and (LazyPig_IsShieldEquipped() and LazyPig_PlayerClass("Warrior", "player") or LazyPig_IsBearForm())) then
+	if(LPCONFIG.SALVA == 1 or LPCONFIG.SALVA == 2 and (LazyPig_IsShieldEquipped() and LazyPig_PlayerClass("Warrior", "player") or LazyPig_IsBearForm() or LazyPig_IsRighteousFuryActive())) then
 		LazyPig_CancelSalvationBuff()
 	end
 end
